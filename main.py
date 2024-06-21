@@ -22,7 +22,7 @@ class AutoLabellingObjectDetect:
         self.text_threshold: float = 0.25
 
         self.out_path: str = 'database/tagged_images/'
-        self.prompt: str = 'car'
+        self.prompt: str = 'tire rim'
         self.home: str = os.getcwd()
 
         self.save: bool = True
