@@ -3,7 +3,7 @@ import os
 import cv2
 import numpy as np
 from PIL import Image
-from typing import Tuple, Any
+from typing import Any
 from GroundingDINO.groundingdino.util.inference import load_model, load_image, predict, annotate
 import GroundingDINO.groundingdino.datasets.transforms as T
 from database.read_database import ReadImages
@@ -46,7 +46,7 @@ class AutoLabellingObjectDetect:
     def config_grounding_model(self) -> Any:
         config_path = os.path.join(self.home, "GroundingDINO/groundingdino/config/GroundingDINO_SwinT_OGC.py")
         check_point_path = 'GroundingDINO/weights/groundingdino_swint_ogc.pth'
-        model =load_model(config_path, check_point_path, device="cuda")
+        model = load_model(config_path, check_point_path, device="cuda")
         return model
 
     def main(self):
@@ -64,9 +64,9 @@ class AutoLabellingObjectDetect:
 
             transform = T.Compose(
                 [
-                T.RandomResize([800], max_size=1333),
-                T.ToTensor(),
-                T.Normalize([0.485, 0.456, 0.406], [0.229, 0.224, 0.225])
+                    T.RandomResize([800], max_size=1333),
+                    T.ToTensor(),
+                    T.Normalize([0.485, 0.456, 0.406], [0.229, 0.224, 0.225])
                 ]
             )
 
@@ -74,12 +74,12 @@ class AutoLabellingObjectDetect:
             img_transform, _ = transform(img_source, None)
 
             boxes, logits, phrases = predict(
-                model = grounding_model,
-                image = img_transform,
-                caption = self.prompt,
-                box_threshold = self.box_threshold,
-                text_threshold = self.text_threshold,
-                device = "cuda"
+                model=grounding_model,
+                image=img_transform,
+                caption=self.prompt,
+                box_threshold=self.box_threshold,
+                text_threshold=self.text_threshold,
+                device="cuda"
             )
 
             if len(boxes) != 0:
@@ -109,7 +109,6 @@ class AutoLabellingObjectDetect:
                     out_frame = cv2.cvtColor(annotated_img, cv2.COLOR_BGR2RGB)
                     cv2.imshow('Grounding DINO detect', out_frame)
                     cv2.waitKey(0)
-
 
             self.cont += 1
 
