@@ -21,7 +21,7 @@ class AutoLabellingObjectDetect:
         self.box_threshold: float = 0.38
         self.text_threshold: float = 0.25
 
-        self.out_path: str = 'database/tagged_images/'
+        self.out_path: str = 'database/annotations/'
         self.prompt: str = 'tire rim'
         self.home: str = os.getcwd()
 
@@ -50,7 +50,7 @@ class AutoLabellingObjectDetect:
         return model
 
     def main(self):
-        self.images, self.names = self.data.read_images('database/untagged_images')
+        self.images, self.names = self.data.read_images('database/images')
         self.num_images = len(self.images)
         grounding_model = self.config_grounding_model()
 
