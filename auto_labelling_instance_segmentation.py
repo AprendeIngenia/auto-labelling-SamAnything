@@ -25,7 +25,7 @@ class AutoLabellingInstanceSegmentation:
         self.box_threshold: float = 0.38
         self.text_threshold: float = 0.25
 
-        self.out_path: str = 'database/tagged_images/'
+        self.out_path: str = 'database/annotations/'
         self.prompt: str = 'tire rim'
         self.home: str = os.getcwd()
 
@@ -77,23 +77,25 @@ class AutoLabellingInstanceSegmentation:
         if self.draw:
             cv2.imshow("semantic segmentation", annotated_image)
 
-    def show_mask(self, mask: Any, image: np.ndarray, random_color: bool = True):
-        if random_color:
-            color = np.concatenate([np.random.random(3), np.array([0.8])], axis=0)
-        else:
-            color = np.array([30 / 255, 144 / 255, 255 / 255, 0.6])
-
-        mask = mask.cpu()
-        h, w = mask.shape[-2:]
-        mask_image = mask.reshape(h, w, 1) * color.reshape(1, 1, -1)
-
+    def show_mask(self, masks: Any, image: np.ndarray, random_color: bool = True, alpha: float = 0.5):
         annotated_frame_pil = Image.fromarray(image).convert("RGBA")
-        mask_image_pil = Image.fromarray((mask_image.cpu().numpy() * 255).astype(np.uint8)).convert("RGBA")
+        for mask in masks:
+            if random_color:
+                color = np.concatenate([np.random.random(3), np.array([alpha])], axis=0)
+            else:
+                color = np.array([30 / 255, 144 / 255, 255 / 255, 0.6])
 
-        return np.array(Image.alpha_composite(annotated_frame_pil, mask_image_pil))
+            mask = mask.cpu()
+            h, w = mask.shape[-2:]
+            mask_image = mask.reshape(h, w, 1) * color.reshape(1, 1, -1)
+
+            mask_image_pil = Image.fromarray((mask_image.cpu().numpy() * 255).astype(np.uint8)).convert("RGBA")
+            annotated_frame_pil = Image.alpha_composite(annotated_frame_pil, mask_image_pil)
+
+        return np.array(annotated_frame_pil.convert("RGB"))
 
     def main(self):
-        self.images, self.names = self.data.read_images('database/untagged_images')
+        self.images, self.names = self.data.read_images('database/images')
         self.num_images = len(self.images)
         grounding_model = self.config_grounding_model()
         self.sam_model, self.mask_generator, self.sam_predictor = self.config_sam_anything()
@@ -141,7 +143,6 @@ class AutoLabellingInstanceSegmentation:
                 boxes=transform_boxes,
                 multimask_output=True
             )
-
             if len(boxes) != 0:
                 h, w, _ = process_image.shape
                 xc, yc, an, al = boxes[0][0], boxes[0][1], boxes[0][2], boxes[0][3]
@@ -166,10 +167,11 @@ class AutoLabellingInstanceSegmentation:
 
                 if self.draw:
                     annotated_img = annotate(image_source=draw_image, boxes=boxes, logits=logits, phrases=phrases)
-                    annotated_frame_with_mask = self.show_mask(masks[0][0], annotated_img)
-                    out_frame = cv2.cvtColor(annotated_frame_with_mask, cv2.COLOR_BGR2RGB)
-                    cv2.imshow('Instance segmentation with SAM', out_frame)
-                    cv2.waitKey(0)
+                    for mask_set in masks:
+                        annotated_frame_with_mask = self.show_mask(mask_set, annotated_img, alpha=0.5)
+                        out_frame = cv2.cvtColor(annotated_frame_with_mask, cv2.COLOR_BGR2RGB)
+                        cv2.imshow('Instance segmentation with SAM', out_frame)
+                        cv2.waitKey(0)
 
             self.cont += 1
 
