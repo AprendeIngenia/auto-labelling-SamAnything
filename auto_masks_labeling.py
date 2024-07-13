@@ -26,12 +26,12 @@ class AutoLabellingInstanceSegmentation:
         self.text_threshold: float = 0.25
 
         self.out_path: str = 'database/annotations/'
-        self.prompt: str = 'tire rim'
+        self.prompt: str = 'glass'
         self.home: str = os.getcwd()
 
         self.save: bool = False
         self.draw: bool = True
-        self.mask_generator_flag: bool = True
+        self.mask_generator_flag: bool = False
 
         self.images: list = []
         self.names: list = []
