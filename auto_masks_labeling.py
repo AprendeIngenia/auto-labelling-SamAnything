@@ -26,11 +26,11 @@ class AutoLabellingInstanceSegmentation:
         self.text_threshold: float = 0.25
 
         self.out_path: str = 'database/annotations/'
-        self.prompt: str = 'glass'
+        self.prompt: str = 'id card'
         self.home: str = os.getcwd()
 
-        self.save: bool = False
-        self.draw: bool = True
+        self.save: bool = True
+        self.draw: bool = False
         self.mask_generator_flag: bool = False
 
         self.images: list = []
@@ -105,6 +105,12 @@ class AutoLabellingInstanceSegmentation:
             print(f'name_image: {self.names[self.cont]}')
 
             process_image = self.images[self.cont]
+
+            if process_image is None:
+                print(f"Error loading image: {self.names[self.cont]}")
+                self.cont += 1
+                continue
+
             copy_image = process_image.copy()
             draw_image = process_image.copy()
 

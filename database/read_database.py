@@ -11,8 +11,13 @@ class ReadImages:
         data = os.listdir(database_path)
 
         for lis in data:
-            imgdb = cv2.imread(f'{database_path}/{lis}')
-            self.images.append(imgdb)
-            self.names.append(os.path.splitext(lis)[0])
+            image_path = os.path.join(database_path, lis)
+            imgdb = cv2.imread(image_path)
+
+            if imgdb is not None:
+                self.images.append(imgdb)
+                self.names.append(os.path.splitext(lis)[0])
+            else:
+                print(f"Warning: Failed to load image {image_path}. Skipping...")
 
         return self.images, self.names
