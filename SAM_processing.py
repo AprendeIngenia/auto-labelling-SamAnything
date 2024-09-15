@@ -103,6 +103,7 @@ class AutoLabellingInstanceSegmentation:
         while self.cont < self.num_images:
             print('------------------------------------')
             print(f'name_image: {self.names[self.cont]}')
+            self.bbox_info = []
 
             process_image = self.images[self.cont]
 
