@@ -30,7 +30,7 @@ class AutoLabellingSaveData:
         self.mask_generator_flag: bool = True
 
         self.extensions: list = ['jpg', 'jpeg', 'png']
-        self.classes: list = ['beer glass']
+        self.classes: list = ['id card']
         self.results_masks: list = []
 
         self.images: dict = {}
